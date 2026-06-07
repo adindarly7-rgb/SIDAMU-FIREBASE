@@ -22,11 +22,26 @@ padding:25px;
 text-align:center;
 background:#042247;
 border-bottom:2px solid #00cfff;
+position:relative;
 }
 
 .header h1{
 margin:0;
 font-size:42px;
+}
+
+#logoutBtn{
+position:absolute;
+right:20px;
+top:20px;
+background:#ff2f2f;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+font-size:16px;
 }
 
 .cards{
@@ -90,8 +105,14 @@ max-height:400px;
 <body>
 
 <div class="header">
+
+<button id="logoutBtn">
+🚪 LOGOUT
+</button>
+
 <h1>SIDAMU COMMAND CENTER</h1>
 <p>Sistem Informasi Depot Air Minum</p>
+
 </div>
 
 <div class="cards">
@@ -124,9 +145,11 @@ max-height:400px;
 </div>
 
 <div class="tableBox">
+
 <h2>Data Depot Air Minum</h2>
 
 <table>
+
 <thead>
 <tr>
 <th>Nama DAM</th>
@@ -140,17 +163,33 @@ max-height:400px;
 </tbody>
 
 </table>
+
 </div>
 
 <script type="module">
 
-import { db } from "./firebase-config.js";
+import { db, auth } from "./firebase-config.js";
 
 import {
 collection,
 getDocs
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import {
+signOut
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+document
+.getElementById("logoutBtn")
+.onclick = async()=>{
+
+await signOut(auth);
+
+window.location.href="admin.html";
+
+};
 
 const totalEl=document.getElementById("total");
 const msEl=document.getElementById("ms");
@@ -163,7 +202,7 @@ let ms=0;
 let tms=0;
 let totalSkor=0;
 
-const snapshot=
+const snapshot =
 await getDocs(collection(db,"damiu"));
 
 snapshot.forEach(doc=>{
@@ -172,15 +211,15 @@ const d=doc.data();
 
 total++;
 
-const status=
+const status =
 d.Status || "";
 
-const skor=
+const skor =
 parseFloat(
 d["Skor Akhir"] || 0
 );
 
-totalSkor+=skor;
+totalSkor += skor;
 
 if(
 status.toLowerCase()
@@ -202,7 +241,7 @@ tbody.innerHTML += `
 
 });
 
-const rata=
+const rata =
 total>0
 ?
 (totalSkor/total).toFixed(1)
@@ -234,4 +273,3 @@ data:[ms,tms]
 
 </body>
 </html>
-```
