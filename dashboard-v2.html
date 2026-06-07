@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>SIDAMU V2</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+display:flex;
+background:#021126;
+color:white;
+}
+
+.sidebar{
+width:250px;
+height:100vh;
+background:#042247;
+padding:20px;
+position:fixed;
+left:0;
+top:0;
+}
+
+.sidebar h2{
+text-align:center;
+margin-bottom:20px;
+}
+
+.sidebar button{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border:none;
+border-radius:8px;
+background:#00cfff;
+cursor:pointer;
+font-weight:bold;
+}
+
+.main{
+margin-left:250px;
+padding:20px;
+width:100%;
+}
+
+.page{
+display:none;
+}
+
+.active{
+display:block;
+}
+
+.card{
+background:#042247;
+padding:20px;
+border-radius:12px;
+margin-bottom:15px;
+border:1px solid #00cfff;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>SIDAMU</h2>
+
+<button onclick="showPage('dashboard')">
+📊 Dashboard
+</button>
+
+<button onclick="showPage('input')">
+📝 Input Hasil
+</button>
+
+<button onclick="showPage('depot')">
+🏢 Tambah Depot
+</button>
+
+<button onclick="showPage('riwayat')">
+📋 Riwayat
+</button>
+
+<button id="logoutBtn">
+🚪 Logout
+</button>
+
+</div>
+
+<div class="main">
+
+<div id="dashboard" class="page active">
+
+<div class="card">
+<h2>Dashboard SIDAMU</h2>
+<p>Data statistik akan tampil di sini</p>
+</div>
+
+</div>
+
+<div id="input" class="page">
+
+<div class="card">
+<h2>Input Hasil Pemeriksaan</h2>
+</div>
+
+</div>
+
+<div id="depot" class="page">
+
+<div class="card">
+<h2>Tambah Depot</h2>
+</div>
+
+</div>
+
+<div id="riwayat" class="page">
+
+<div class="card">
+<h2>Riwayat Pemeriksaan</h2>
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function showPage(page){
+
+document
+.querySelectorAll(".page")
+.forEach(p=>p.classList.remove("active"));
+
+document
+.getElementById(page)
+.classList.add("active");
+
+}
+
+</script>
+
+</body>
+</html>
