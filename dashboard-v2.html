@@ -69,9 +69,88 @@ margin-bottom:15px;
 border:1px solid #00cfff;
 }
 
+input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+}
+
+button{
+padding:12px 20px;
+background:#00cfff;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
 </style>
 </head>
+<script type="module">
 
+import { db } from "./firebase-config.js";
+
+import {
+collection,
+query,
+where,
+getDocs,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+document
+.getElementById("updateBtn")
+.onclick = async()=>{
+
+const nama =
+document.getElementById("namaInput").value;
+
+const skor =
+document.getElementById("skorInput").value;
+
+const status =
+document.getElementById("statusInput").value;
+
+const tanggal =
+document.getElementById("tanggalInput").value;
+
+const q=query(
+collection(db,"damiu"),
+where("Nama DAM","==",nama)
+);
+
+const snap=await getDocs(q);
+
+if(snap.empty){
+
+document
+.getElementById("hasilUpdate")
+.innerHTML =
+"❌ Depot tidak ditemukan";
+
+return;
+
+}
+
+await updateDoc(
+snap.docs[0].ref,
+{
+"Skor Akhir":skor,
+"Status":status,
+"Tanggal Penilaian":tanggal
+}
+);
+
+document
+.getElementById("hasilUpdate")
+.innerHTML =
+"✅ Data berhasil diupdate";
+
+};
+
+</script>
 <body>
 
 <div class="sidebar">
@@ -114,7 +193,37 @@ border:1px solid #00cfff;
 <div id="input" class="page">
 
 <div class="card">
+
 <h2>Input Hasil Pemeriksaan</h2>
+
+<br>
+
+<input id="namaInput" placeholder="Nama DAM">
+
+<br><br>
+
+<input id="skorInput" placeholder="Skor Akhir">
+
+<br><br>
+
+<input id="statusInput" placeholder="Status">
+
+<br><br>
+
+<input id="tanggalInput" placeholder="Tanggal Penilaian">
+
+<br><br>
+
+<button id="updateBtn">
+
+SIMPAN PERUBAHAN
+
+</button>
+
+<br><br>
+
+<div id="hasilUpdate"></div>
+
 </div>
 
 </div>
