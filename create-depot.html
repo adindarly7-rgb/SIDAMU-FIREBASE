@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Buat Akun Depot SIDAMU</title>
+
+<style>
+
+body{
+background:#021126;
+color:white;
+font-family:Segoe UI,sans-serif;
+padding:30px;
+max-width:700px;
+margin:auto;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border:none;
+border-radius:8px;
+}
+
+button{
+padding:12px 25px;
+background:#00cfff;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
+#hasil{
+margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>BUAT AKUN DEPOT</h1>
+
+<input
+id="namaDepot"
+placeholder="Nama Depot">
+
+<input
+id="email"
+placeholder="Email Depot">
+
+<input
+id="password"
+type="password"
+placeholder="Password">
+
+<button id="buat">
+
+BUAT AKUN DEPOT
+
+</button>
+
+<div id="hasil"></div>
+
+<script type="module">
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+createUserWithEmailAndPassword
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+doc,
+setDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+document
+.getElementById("buat")
+.onclick = async()=>{
+
+const namaDepot =
+document.getElementById("namaDepot").value;
+
+const email =
+document.getElementById("email").value;
+
+const password =
+document.getElementById("password").value;
+
+try{
+
+const userCredential =
+await createUserWithEmailAndPassword(
+auth,
+email,
+password
+);
+
+await setDoc(
+doc(
+db,
+"users",
+userCredential.user.uid
+),
+{
+email:email,
+role:"depot",
+depot:namaDepot,
+createdAt:new Date()
+}
+);
+
+document
+.getElementById("hasil")
+.innerHTML =
+"✅ Akun depot berhasil dibuat";
+
+}catch(err){
+
+document
+.getElementById("hasil")
+.innerHTML =
+"❌ " + err.message;
+
+console.error(err);
+
+}
+
+};
+
+</script>
+
+</body>
+</html>

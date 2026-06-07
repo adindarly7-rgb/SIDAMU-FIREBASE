@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Dashboard Depot SIDAMU</title>
+
+<style>
+
+body{
+margin:0;
+background:#021126;
+font-family:Segoe UI,sans-serif;
+color:white;
+}
+
+.header{
+padding:25px;
+text-align:center;
+background:#042247;
+border-bottom:2px solid #00cfff;
+}
+
+.card{
+background:#042247;
+margin:20px;
+padding:25px;
+border-radius:15px;
+border:1px solid #00cfff;
+}
+
+.value{
+font-size:30px;
+font-weight:bold;
+color:#00e5ff;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>SIDAMU DEPOT PANEL</h1>
+<p>Hasil Penilaian Depot Air Minum</p>
+</div>
+
+<div class="card">
+Nama Depot
+<div id="nama" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Status
+<div id="status" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Skor Akhir
+<div id="skor" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Tanggal Penilaian
+<div id="tanggal" class="value">Loading...</div>
+</div>
+
+<div class="card">
+Alamat
+<div id="alamat" class="value">Loading...</div>
+</div>
+
+<script type="module">
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+onAuthStateChanged
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+collection,
+query,
+where,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+onAuthStateChanged(auth, async(user)=>{
+
+if(!user){
+
+location.href="index.html";
+return;
+
+}
+
+const userQuery=query(
+collection(db,"users"),
+where("email","==",user.email)
+);
+
+const userSnap=await getDocs(userQuery);
+
+if(userSnap.empty){
+
+alert("User tidak ditemukan");
+return;
+
+}
+
+const depotName=userSnap.docs[0].data().depot;
+
+const damQuery=query(
+collection(db,"damiu"),
+where("Nama DAM","==",depotName)
+);
+
+const damSnap=await getDocs(damQuery);
+
+if(damSnap.empty){
+
+alert("Data depot tidak ditemukan");
+return;
+
+}
+
+const data=damSnap.docs[0].data();
+
+document.getElementById("nama").innerHTML =
+data["Nama DAM"] || "-";
+
+document.getElementById("status").innerHTML =
+data["Status"] || "-";
+
+document.getElementById("skor").innerHTML =
+data["Skor Akhir"] || "-";
+
+document.getElementById("tanggal").innerHTML =
+data["Tanggal Penilaian"] || "-";
+
+document.getElementById("alamat").innerHTML =
+data["Alamat"] || "-";
+
+});
+
+</script>
+
+</body>
+</html>

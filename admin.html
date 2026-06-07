@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SIDAMU Login</title>
+
+<style>
+
+body{
+background:#021126;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:Arial;
+}
+
+.box{
+width:400px;
+background:#042247;
+padding:30px;
+border-radius:20px;
+border:1px solid #00cfff;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:10px;
+margin-bottom:10px;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+padding:12px;
+background:#00cfff;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+h2{
+color:white;
+text-align:center;
+}
+
+#status{
+color:#ff8080;
+margin-top:10px;
+text-align:center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>LOGIN SIDAMU</h2>
+
+<input
+id="email"
+type="email"
+placeholder="Email">
+
+<input
+id="password"
+type="password"
+placeholder="Password">
+
+<button id="loginBtn">
+
+LOGIN
+
+</button>
+
+<div id="status"></div>
+
+</div>
+
+<script type="module">
+
+import { auth, db } from "./firebase-config.js";
+
+import {
+signInWithEmailAndPassword
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+collection,
+query,
+where,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const loginBtn =
+document.getElementById("loginBtn");
+
+const email =
+document.getElementById("email");
+
+const password =
+document.getElementById("password");
+
+const status =
+document.getElementById("status");
+
+loginBtn.onclick = async()=>{
+
+try{
+
+await signInWithEmailAndPassword(
+auth,
+email.value,
+password.value
+);
+
+const q =
+query(
+collection(db,"users"),
+where("email","==",email.value)
+);
+
+const snap =
+await getDocs(q);
+
+if(snap.empty){
+
+status.innerHTML =
+"Role user tidak ditemukan";
+
+return;
+
+}
+
+const userData =
+snap.docs[0].data();
+
+if(userData.role === "admin"){
+
+window.location.href =
+"dashboard.html";
+
+}
+else if(userData.role === "depot"){
+
+window.location.href =
+"depot-dashboard.html";
+
+}
+else{
+
+status.innerHTML =
+"Role tidak dikenal";
+
+}
+
+}catch(err){
+
+console.error(err);
+
+status.innerHTML =
+err.message;
+
+}
+
+};
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>SIDAMU COMMAND CENTER</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+margin:0;
+background:#021126;
+font-family:Segoe UI,sans-serif;
+color:white;
+}
+
+.header{
+padding:25px;
+text-align:center;
+background:#042247;
+border-bottom:2px solid #00cfff;
+}
+
+.header h1{
+margin:0;
+font-size:42px;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+padding:20px;
+}
+
+.card{
+background:#042247;
+padding:25px;
+border-radius:15px;
+text-align:center;
+border:1px solid #00cfff;
+}
+
+.card h2{
+font-size:40px;
+margin:0;
+}
+
+.chartBox{
+margin:20px;
+padding:20px;
+background:#042247;
+border-radius:15px;
+border:1px solid #00cfff;
+}
+
+.tableBox{
+margin:20px;
+padding:20px;
+background:#042247;
+border-radius:15px;
+border:1px solid #00cfff;
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #0a4f80;
+}
+
+th{
+background:#05305e;
+}
+
+canvas{
+max-height:400px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h1>SIDAMU COMMAND CENTER</h1>
+<p>Sistem Informasi Depot Air Minum</p>
+</div>
+
+<div class="cards">
+
+<div class="card">
+<h2 id="total">0</h2>
+<p>Total DAMIU</p>
+</div>
+
+<div class="card">
+<h2 id="ms">0</h2>
+<p>Memenuhi Syarat</p>
+</div>
+
+<div class="card">
+<h2 id="tms">0</h2>
+<p>Tidak Memenuhi Syarat</p>
+</div>
+
+<div class="card">
+<h2 id="rata">0</h2>
+<p>Rata-rata Skor</p>
+</div>
+
+</div>
+
+<div class="chartBox">
+<h2>Status DAMIU</h2>
+<canvas id="statusChart"></canvas>
+</div>
+
+<div class="tableBox">
+<h2>Data Depot Air Minum</h2>
+
+<table>
+<thead>
+<tr>
+<th>Nama DAM</th>
+<th>Alamat</th>
+<th>Status</th>
+<th>Skor Akhir</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+</tbody>
+
+</table>
+</div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+
+import {
+collection,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const totalEl=document.getElementById("total");
+const msEl=document.getElementById("ms");
+const tmsEl=document.getElementById("tms");
+const rataEl=document.getElementById("rata");
+const tbody=document.getElementById("tbody");
+
+let total=0;
+let ms=0;
+let tms=0;
+let totalSkor=0;
+
+const snapshot=
+await getDocs(collection(db,"damiu"));
+
+snapshot.forEach(doc=>{
+
+const d=doc.data();
+
+total++;
+
+const status=
+d.Status || "";
+
+const skor=
+parseFloat(
+d["Skor Akhir"] || 0
+);
+
+totalSkor+=skor;
+
+if(
+status.toLowerCase()
+.includes("memenuhi")
+){
+ms++;
+}else{
+tms++;
+}
+
+tbody.innerHTML += `
+<tr>
+<td>${d["Nama DAM"] || "-"}</td>
+<td>${d["Alamat"] || "-"}</td>
+<td>${status}</td>
+<td>${skor}</td>
+</tr>
+`;
+
+});
+
+const rata=
+total>0
+?
+(totalSkor/total).toFixed(1)
+:
+0;
+
+totalEl.innerHTML=total;
+msEl.innerHTML=ms;
+tmsEl.innerHTML=tms;
+rataEl.innerHTML=rata;
+
+new Chart(
+document.getElementById("statusChart"),
+{
+type:"pie",
+data:{
+labels:[
+"Memenuhi Syarat",
+"Tidak Memenuhi Syarat"
+],
+datasets:[{
+data:[ms,tms]
+}]
+}
+}
+);
+
+</script>
+
+</body>
+</html>
+```

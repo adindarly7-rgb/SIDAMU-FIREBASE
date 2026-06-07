@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Import CSV SIDAMU</title>
+
+<style>
+
+body{
+background:#021126;
+color:white;
+font-family:Arial,sans-serif;
+padding:30px;
+}
+
+h1{
+margin-bottom:20px;
+}
+
+button{
+padding:12px 25px;
+background:#00cfff;
+border:none;
+cursor:pointer;
+font-weight:bold;
+}
+
+input{
+margin-bottom:20px;
+}
+
+#status{
+margin-top:20px;
+font-size:18px;
+color:#00ff99;
+white-space:pre-wrap;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>IMPORT CSV SIDAMU</h1>
+
+<input
+type="file"
+id="csvFile"
+accept=".csv">
+
+<br><br>
+
+<button id="uploadBtn">
+UPLOAD KE FIRESTORE
+</button>
+
+<div id="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+
+import {
+collection,
+addDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const uploadBtn =
+document.getElementById("uploadBtn");
+
+const csvFile =
+document.getElementById("csvFile");
+
+const status =
+document.getElementById("status");
+
+uploadBtn.onclick = ()=>{
+
+const file =
+csvFile.files[0];
+
+if(!file){
+
+alert("Pilih file CSV terlebih dahulu");
+
+return;
+
+}
+
+status.innerHTML =
+"Sedang membaca CSV...";
+
+Papa.parse(file,{
+
+header:true,
+
+skipEmptyLines:true,
+
+complete: async(result)=>{
+
+try{
+
+let berhasil = 0;
+
+for(const row of result.data){
+
+let cleanData = {};
+
+Object.keys(row).forEach(key=>{
+
+// Hapus header kosong
+if(!key) return;
+
+const cleanKey =
+key.trim();
+
+if(cleanKey === "") return;
+
+// Ganti karakter yang tidak disukai Firestore
+const finalKey =
+cleanKey
+.replace(/\./g,"_")
+.replace(/\[/g,"")
+.replace(/\]/g,"")
+.replace(/\//g,"_")
+.replace(/\#/g,"")
+.replace(/\$/g,"")
+.replace(/\*/g,"")
+.replace(/\:/g,"_");
+
+// Pastikan value tidak undefined
+cleanData[finalKey] =
+row[key] ?? "";
+
+});
+
+await addDoc(
+collection(db,"damiu"),
+cleanData
+);
+
+berhasil++;
+
+status.innerHTML =
+`Import ${berhasil} data...`;
+
+}
+
+status.innerHTML =
+`✅ IMPORT SELESAI (${berhasil} data)`;
+
+}catch(error){
+
+console.error(error);
+
+status.innerHTML =
+"❌ ERROR : " + error.message;
+
+}
+
+}
+
+});
+
+};
+
+</script>
+
+</body>
+</html>

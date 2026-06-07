@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Input Hasil SIDAMU</title>
+
+<style>
+
+body{
+background:#021126;
+color:white;
+font-family:Segoe UI;
+max-width:800px;
+margin:auto;
+padding:30px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:12px;
+border:none;
+border-radius:8px;
+}
+
+button{
+padding:12px 25px;
+background:#00cfff;
+border:none;
+border-radius:8px;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>UPDATE HASIL DEPOT</h1>
+
+<input id="nama" placeholder="Nama DAM">
+
+<input id="skor" placeholder="Skor Akhir">
+
+<input id="status" placeholder="Status">
+
+<input id="tanggal" placeholder="Tanggal Penilaian">
+
+<button id="simpan">
+
+SIMPAN
+
+</button>
+
+<div id="hasil"></div>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+
+import {
+collection,
+query,
+where,
+getDocs,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+simpan.onclick = async()=>{
+
+const nama =
+document.getElementById("nama").value;
+
+const skor =
+document.getElementById("skor").value;
+
+const status =
+document.getElementById("status").value;
+
+const tanggal =
+document.getElementById("tanggal").value;
+
+const q=query(
+collection(db,"damiu"),
+where("Nama DAM","==",nama)
+);
+
+const snap=await getDocs(q);
+
+if(snap.empty){
+
+hasil.innerHTML="Depot tidak ditemukan";
+return;
+
+}
+
+await updateDoc(
+snap.docs[0].ref,
+{
+"Skor Akhir":skor,
+"Status":status,
+"Tanggal Penilaian":tanggal
+}
+);
+
+hasil.innerHTML="✅ Berhasil diupdate";
+
+};
+
+</script>
+
+</body>
+</html>
